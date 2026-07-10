@@ -10,4 +10,4 @@ tags: ["idk"]
 - **Domain:** `rennivik.xyz`, registered via Namecheap.
 
 ## Why?
-I dont want to pay for things.
+I dont want to pay for things :)
