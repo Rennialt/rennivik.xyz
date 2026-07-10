@@ -11,6 +11,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: build-blog
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -21,13 +25,16 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Install build dependencies
         run: npm install --no-save gray-matter marked
 
       - name: Build posts.json
         run: node scripts/build-blog.js
+
+      - name: Sync with remote before pushing
+        run: git pull --rebase --autostash origin main
 
       - name: Commit updated posts.json
         uses: stefanzweifel/git-auto-commit-action@v5
