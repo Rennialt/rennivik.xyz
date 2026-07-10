@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Blog · rennivik.xyz</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/blog.css">
+    <link rel="icon" href="assets/images/favicon.png" type="image/png">
+</head>
+<body>
+
+    <div class="nav">
+        <nav class="navbar">
+            <a href="index.html" class="logo">
+                <img src="assets/images/favicon.png" alt="rennivik.xyz">
+            </a>
+
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a id="active" href="blogs.html">Blog</a>
+                <a href="sites.html">Sites</a>
+            </div>
+        </nav>
+
+        <hr>
+    </div>
+
+    <div class="content">
+        <section class="post-list" id="listView">
+            <h1>Blog</h1>
+            <p class="subtitle">Notes, sites, and whatever else is worth writing down.</p>
+
+            <div class="posts" id="posts"></div>
+            <p class="post-empty" id="empty" hidden>No posts yet. Check back soon.</p>
+        </section>
+
+        <article class="post" id="postView" hidden>
+            <a class="post-back" href="blogs.html">← Back to blog</a>
+            <div id="postContent"></div>
+        </article>
+    </div>
+
+    <div class="credits">
+        <hr>
+        <p>&copy; 2026 Rennivik. All rights reserved.</p>
+    </div>
+
+    <script>
+        window.addEventListener("scroll", () => {
+            document.body.style.setProperty(
+                "--scroll",
+                `${window.scrollY * 0.05}px`
+            );
+        });
+
+        function escapeHtml(str) {
+            const div = document.createElement("div");
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function formatDate(dateStr) {
+            const d = new Date(dateStr);
+            return d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+        }
+
+        async function fetchPosts() {
+            const res = await fetch("blogs/posts.json", { cache: "no-store" });
+            if (!res.ok) throw new Error("blogs/posts.json not found");
+            return res.json();
+        }
+
+        function renderList(posts) {
+            const container = document.getElementById("posts");
+            const empty = document.getElementById("empty");
+
+            if (!posts.length) {
+                empty.hidden = false;
+                return;
+            }
+
+            posts.forEach((post) => {
+                const a = document.createElement("a");
+                a.className = "post-card";
+                a.href = `blogs.html?post=${encodeURIComponent(post.slug)}`;
+
+                a.innerHTML = `
+                    <div>
+                        <div class="post-card-meta">
+                            <span>${formatDate(post.date)}</span>
+                            <span>·</span>
+                            <span>${escapeHtml(post.readTime || "")}</span>
+                        </div>
+                        <h2>${escapeHtml(post.title)}</h2>
+                        <p>${escapeHtml(post.excerpt)}</p>
+                    </div>
+                    <span class="post-button">Read ↗</span>
+                `;
+
+                container.appendChild(a);
+            });
+        }
+
+        function renderPost(post) {
+            document.getElementById("page-title").textContent = `${post.title} · rennivik.xyz`;
+
+            const tagsHtml = (post.tags || [])
+                .map((t) => `<span class="post-tag">${escapeHtml(t)}</span>`)
+                .join("");
+
+            document.getElementById("postContent").innerHTML = `
+                <div class="post-header">
+                    <h1>${escapeHtml(post.title)}</h1>
+                    <div class="post-card-meta">
+                        <span>${formatDate(post.date)}</span>
+                        <span>·</span>
+                        <span>${escapeHtml(post.readTime || "")}</span>
+                    </div>
+                    ${tagsHtml ? `<div class="post-tags">${tagsHtml}</div>` : ""}
+                </div>
+                <div class="post-body">${post.html}</div>
+            `;
+        }
+
+        async function init() {
+            const params = new URLSearchParams(window.location.search);
+            const slug = params.get("post");
+
+            const listView = document.getElementById("listView");
+            const postView = document.getElementById("postView");
+
+            try {
+                const posts = await fetchPosts();
+
+                if (slug) {
+                    const post = posts.find((p) => p.slug === slug);
+                    listView.hidden = true;
+                    postView.hidden = false;
+
+                    if (post) {
+                        renderPost(post);
+                    } else {
+                        document.getElementById("postContent").innerHTML = "<p>Post not found.</p>";
+                    }
+                } else {
+                    listView.hidden = false;
+                    postView.hidden = true;
+                    renderList(posts);
+                }
+            } catch (err) {
+                const empty = document.getElementById("empty");
+                empty.textContent = "Couldn't load posts right now.";
+                empty.hidden = false;
+                console.error(err);
+            }
+        }
+
+        init();
+    </script>
+
+</body>
+</html>
