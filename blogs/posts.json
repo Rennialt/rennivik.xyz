@@ -1,0 +1,13 @@
+[
+  {
+    "slug": "first_post",
+    "title": "First Post",
+    "date": "10-7-2026",
+    "excerpt": "The first post on rennivik.xyz",
+    "tags": [
+      "idk"
+    ],
+    "readTime": "1 min read",
+    "html": "<h2>How the site is run.</h2>\n<ul>\n<li><strong>Hosting:</strong> GitHub Pages.</li>\n<li><strong>Domain:</strong> <code>rennivik.xyz</code>, registered via Namecheap.</li>\n</ul>\n<h2>Why?</h2>\n<p>I dont want to pay for things :)</p>\n"
+  }
+]
