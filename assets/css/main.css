@@ -13,9 +13,12 @@ body {
     min-height: 100vh;
 
     background:
-        radial-gradient(circle at top left, rgba(0,0,0,0.05), transparent 35%),
-        radial-gradient(circle at bottom right, rgba(0,0,0,0.04), transparent 35%);
+        linear-gradient(rgba(255,255,255,0.75), rgba(255,255,255,0.75)),
+        url("https://images.rennivik.xyz/background.png");
 
+    background-size: 700px auto;
+    background-position: left bottom;
+    background-repeat: no-repeat;
     background-attachment: fixed;
 }
 

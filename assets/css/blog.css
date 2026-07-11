@@ -1,5 +1,3 @@
-/* Extends main.css. Load this AFTER main.css on blogs.html. */
-
 .post-list {
     width: min(800px, 100%);
 }
@@ -84,8 +82,6 @@
     opacity: 0.6;
     margin-top: 40px;
 }
-
-/* Single post view */
 
 .post {
     width: min(700px, 100%);
