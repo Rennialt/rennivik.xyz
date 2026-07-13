@@ -41,6 +41,13 @@
     </div>
 
     <script>
+        (async () => {
+            if (!document.cookie.includes("rennguard_session=")) {
+                window.location.href =
+                    "https://auth.rennivik.xyz/rennivik.xyz?redirect=" +
+                    encodeURIComponent(window.location.href);
+            }
+        })();
         window.addEventListener("scroll", () => {
             document.body.style.setProperty(
                 "--scroll",
