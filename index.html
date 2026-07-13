@@ -41,13 +41,51 @@
     </div>
 
     <script>
-        (async () => {
-            if (!document.cookie.includes("rennguard_session=")) {
-                window.location.href =
-                    "https://auth.rennivik.xyz/rennivik.xyz?redirect=" +
-                    encodeURIComponent(window.location.href);
+        (function () {
+            "use strict";
+            
+            var RENNGUARD_AUTH = "https://auth.rennivik.xyz";
+            var site = window.location.hostname;
+            
+            var styleTag = document.createElement("style");
+            styleTag.id = "rennguard-cloak";
+            styleTag.textContent = "html{visibility:hidden !important}";
+            document.documentElement.appendChild(styleTag);
+            
+            function reveal() {
+                var el = document.getElementById("rennguard-cloak");
+                if (el) el.remove();
             }
-        })();
+            
+            function sendToLogin() {
+                var redirect = encodeURIComponent(window.location.href);
+                window.location.replace(RENNGUARD_AUTH + "/" + site + "?redirect=" + redirect);
+            }
+            
+            fetch(RENNGUARD_AUTH + "/api/verify?site=" + encodeURIComponent(site), {
+                method: "GET",
+                credentials: "include",
+                cache: "no-store",
+            })
+                .then(function (res) {
+                if (!res.ok) throw new Error("not authenticated");
+                return res.json();
+                })
+                .then(function (data) {
+                if (!data || data.authenticated !== true) throw new Error("not authenticated");
+                window.rennguardUser = data.user;
+                reveal();
+                })
+                .catch(function () {
+                sendToLogin();
+                });
+            
+            setTimeout(function () {
+                var el = document.getElementById("rennguard-cloak");
+                if (el) sendToLogin();
+            }, 8000);
+            })();
+            
         window.addEventListener("scroll", () => {
             document.body.style.setProperty(
                 "--scroll",
